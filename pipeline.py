@@ -77,7 +77,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20250703.03'
+VERSION = '20250703.04'
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0'
 TRACKER_ID = 'glitch'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -305,6 +305,7 @@ class WgetArgs(object):
         with open(os.path.join(item['item_dir'], 'zstdict'), 'wb') as f:
             f.write(dict_data['dict'])
         item['dict_id'] = dict_data['id']
+        item['dict_data'] = dict_data['dict']
         item['dict_project'] = TRACKER_ID
         wget_args.extend([
             '--warc-zstd-dict', ItemInterpolation('%(item_dir)s/zstdict'),
