@@ -753,13 +753,13 @@ wget.callbacks.finish = function(start_time, end_time, wall_time, numurls, total
       end
       count = count + 1
       if count == 1000 then
-        --submit_backfeed(items, key)
+        submit_backfeed(items, key)
         items = nil
         count = 0
       end
     end
     if items ~= nil then
-      --submit_backfeed(items, key)
+      submit_backfeed(items, key)
     end
   end
 end
