@@ -77,7 +77,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20250703.02'
+VERSION = '20250703.03'
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0'
 TRACKER_ID = 'glitch'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -148,6 +148,20 @@ class PrepareDirectories(SimpleTask):
 
         open('%(item_dir)s/%(warc_file_base)s.warc.zst' % item, 'w').close()
         open('%(item_dir)s/%(warc_file_base)s_data.txt' % item, 'w').close()
+
+
+class CheckIntegrity(SimpleTask):
+    def __init__(self):
+        SimpleTask.__init__(self, 'CheckIntegrity')
+
+    def process(self, item):
+        dctx = zstandard.ZstdDecompressor(
+            dict_data=zstandard.ZstdCompressionDict(item['dict_data'])
+        )
+        with open('%(item_dir)s/%(warc_file_base)s.warc.zst' % item, 'rb') as fin, \
+            open('/dev/null', 'wb') as fout:
+            dctx.copy_stream(fin, fout)
+
 
 class MoveFiles(SimpleTask):
     def __init__(self):
@@ -346,7 +360,7 @@ project = Project(
 pipeline = Pipeline(
     CheckIP(),
     GetItemFromTracker('http://{}/{}/multi={}/'
-        .format(TRACKER_HOST, 'arkivertest6', MULTI_ITEM_SIZE),
+        .format(TRACKER_HOST, TRACKER_ID, MULTI_ITEM_SIZE),
         downloader, VERSION),
     PrepareDirectories(warc_prefix=TRACKER_ID),
     WgetDownload(
@@ -360,6 +374,7 @@ pipeline = Pipeline(
             'concurrency': ItemValue('concurrency')
         }
     ),
+    CheckIntegrity(),
     SetBadUrls(),
     PrepareStatsForTracker(
         defaults={'downloader': downloader, 'version': VERSION},
@@ -370,7 +385,7 @@ pipeline = Pipeline(
         },
         id_function=stats_id_function,
     ),
-    #MoveFiles(),
+    MoveFiles(),
     LimitConcurrent(NumberConfigValue(min=1, max=20, default='20',
         name='shared:rsync_threads', title='Rsync threads',
         description='The maximum number of concurrent uploads.'),
