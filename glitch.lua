@@ -625,7 +625,8 @@ wget.callbacks.write_to_warc = function(url, http_stat)
     end
   end
   if http_stat["statcode"] ~= 200
-    and http_stat["statcode"] ~= 404 then
+    and http_stat["statcode"] ~= 404
+    and http_stat["statcode"] ~= 301 then
     print("Bad status code.")
     retry_url = true
     return false
