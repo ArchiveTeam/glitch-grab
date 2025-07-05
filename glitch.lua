@@ -546,9 +546,9 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
           num_queued = num_queued + 1
         end
       end
-      if num_queued == 0 then
+      --[[if num_queued == 0 then
         error("Nothing was found and queued from the repository...")
-      end
+      end]]
       local assets_file = io.open(repo_dir .. "/.glitch-assets")
       if assets_file then
         for line in string.gmatch(assets_file:read("*all"), "([^\n]+)") do
