@@ -429,7 +429,8 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
   end
 
   if allowed(url)
-    and status_code < 300 then
+    and status_code < 300
+    and item_type ~= "asset" then
     html = read_file(file)
     if string.match(url, "https?://api%.glitch%.com/v1/projects/by/domain%?domain=") then
       local json = cjson.decode(html)
@@ -622,6 +623,22 @@ wget.callbacks.write_to_warc = function(url, http_stat)
       print("Waking up...")
       retry_url = true
       return false
+    end
+  end
+  if http_stat["statcode"] == 403 then
+    if string.match(url["url"], "/refs%?service=git%-upload%-pack$") then
+      discovered_items["git:" .. item_value] = true
+      retry_url = false
+      tries = 0
+      return false
+    elseif string.match(url["url"], "^https?://[^%.]+%.glitch%.me/$") then
+      local html = read_file(http_stat["local_file"])
+      if string.match(html, "<h1>Oops! This project isn't running%.</h1>")
+        and string.match(html, ">Node%.js</a> it relies on is too old%.</p>") then
+        retry_url = false
+        tries = 0
+        return true
+      end
     end
   end
   if http_stat["statcode"] ~= 200
