@@ -703,7 +703,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
       io.stdout:flush()
       tries = 0
       abort_item()
-      return wget.actions.ABORT
+      return wget.actions.EXIT
     end
     local sleep_time = math.random(
       math.floor(math.pow(2, tries-0.5)),
