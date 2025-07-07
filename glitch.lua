@@ -155,7 +155,8 @@ allowed = function(url, parenturl)
     ["^https?://(cdn%.glitch%..+)$"]="asset",
     ["^https?://(cdn%.hyperdev%.com.+)$"]="asset",
     ["^https?://(cdn%.gomix%.com.+)$"]="asset",
-    ["^https?://([^%.]+%.glitch%.me/.*)$"]="glitchme"
+    ["^https?://([^%.]+%.glitch%.me/.*)$"]="glitchme",
+    ["^https?://api%.glitch%.com/git/([^/]+)"]="git"
   }) do
     match = string.match(url, pattern)
     if match
