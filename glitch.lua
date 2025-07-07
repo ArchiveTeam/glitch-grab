@@ -155,9 +155,14 @@ allowed = function(url, parenturl)
     ["^https?://(cdn%.glitch%..+)$"]="asset",
     ["^https?://(cdn%.hyperdev%.com.+)$"]="asset",
     ["^https?://(cdn%.gomix%.com.+)$"]="asset",
+    ["^https?://([^%.]+%.glitch%.me/.*)$"]="glitchme"
   }) do
     match = string.match(url, pattern)
-    if match then
+    if match
+      and (
+        type_ ~= "glitchme"
+        or not string.match(match, "^cdn%.")
+      ) then
       local new_item = type_ .. ":" .. match
       if new_item ~= item_name then
         discover_item(discovered_items, new_item)
