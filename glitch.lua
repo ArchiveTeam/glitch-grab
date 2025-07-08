@@ -434,6 +434,26 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     return result
   end
 
+  if item_type == "asset" then
+    local newurl = string.match(url, "^([^%?]+)")
+    check(newurl)
+    if string.match(url, "%?") then
+      local params = string.match(url, "%?(.+)$")
+      if string.match(params, "^v=") then
+        check(newurl .. "?" .. string.match(params, "v=(.+)$"))
+      else
+        check(newurl .. "?v=" .. params)
+      end
+    end
+    if string.match(url, "%?.+Z$") then
+      local y, m, d, H, M, S, e = string.match(url, "%?v?=?([0-9][0-9][0-9][0-9])%-([0-9][0-9])%-([0-9][0-9])T([0-9][0-9]):([0-9][0-9]):([0-9][0-9])%.([0-9]+)Z$")
+      check(newurl .. "?v=" .. tostring(os.time({day=d,month=m,year=y,hour=H,min=M,sec=S})) .. e)
+    elseif string.match(url, "%?[0-9]+$") then
+      local timestamp, e = string.match(url, "%?([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])([0-9]*)$")
+      check(newurl .. "?v=" .. os.date("%Y-%m-%dT%H:%M:%S", tonumber(timestamp)) .. "." .. e .. "Z")
+    end
+  end
+
   if allowed(url)
     and status_code < 300
     and item_type ~= "asset" then
