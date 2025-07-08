@@ -440,6 +440,9 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     html = read_file(file)
     if string.match(url, "https?://api%.glitch%.com/v1/projects/by/domain%?domain=") then
       local json = cjson.decode(html)
+      if not json[item_value] then
+        return urls
+      end
       check("https://api.glitch.com/v1/projects/by/domain/users?domain=" .. item_value .. "&limit=100")
       check("https://api.glitch.com/v1/projects/by/domain/teams?domain=" .. item_value .. "&limit=100")
       check("https://" .. item_value .. ".glitch.me/")
