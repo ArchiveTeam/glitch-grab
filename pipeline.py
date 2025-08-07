@@ -77,7 +77,7 @@ if not WGET_AT:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20250805.01'
+VERSION = '20250807.01'
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0'
 TRACKER_ID = 'glitch'
 TRACKER_HOST = 'legacy-api.arpa.li'
@@ -323,6 +323,8 @@ class WgetArgs(object):
         for item_name in item['item_name'].split('\0'):
             wget_args.extend(['--warc-header', 'x-wget-at-project-item-name: '+item_name])
             wget_args.append('item-name://'+item_name)
+            if item_name.startswith('http://') or item_name.startswith('https://'):
+                item_name = 'asset:' + item_name.split('/', 2)[-1]
             item_type, item_value = item_name.split(':', 1)
             if item_type == 'domain':
                 wget_args.extend(['--warc-header', 'glitch-domain: '+item_value])

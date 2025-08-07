@@ -437,7 +437,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
   if item_type == "asset" then
     local newurl = string.match(url, "^([^%?]+)")
     check(newurl)
-    if string.match(url, "%?") then
+    if string.match(url, "%?.") then
       local params = string.match(url, "%?(.+)$")
       if string.match(params, "^v=") then
         check(newurl .. "?" .. string.match(params, "v=(.+)$"))
@@ -447,10 +447,14 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     end
     if string.match(url, "%?.+Z$") then
       local y, m, d, H, M, S, e = string.match(url, "%?v?=?([0-9][0-9][0-9][0-9])%-([0-9][0-9])%-([0-9][0-9])T([0-9][0-9]):([0-9][0-9]):([0-9][0-9])%.([0-9]+)Z$")
-      check(newurl .. "?v=" .. tostring(os.time({day=d,month=m,year=y,hour=H,min=M,sec=S})) .. e)
+      if e then
+        check(newurl .. "?v=" .. tostring(os.time({day=d,month=m,year=y,hour=H,min=M,sec=S})) .. e)
+      end
     elseif string.match(url, "%?[0-9]+$") then
       local timestamp, e = string.match(url, "%?([0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])([0-9]*)$")
-      check(newurl .. "?v=" .. os.date("%Y-%m-%dT%H:%M:%S", tonumber(timestamp)) .. "." .. e .. "Z")
+      if e then
+        check(newurl .. "?v=" .. os.date("%Y-%m-%dT%H:%M:%S", tonumber(timestamp)) .. "." .. e .. "Z")
+      end
     end
   end
 
@@ -672,7 +676,8 @@ wget.callbacks.write_to_warc = function(url, http_stat)
   end
   if http_stat["statcode"] ~= 200
     and http_stat["statcode"] ~= 404
-    and http_stat["statcode"] ~= 301 then
+    and http_stat["statcode"] ~= 301
+    and http_stat["statcode"] ~= 403 then
     print("Bad status code.")
     retry_url = true
     return false
