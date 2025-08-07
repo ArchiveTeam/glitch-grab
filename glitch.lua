@@ -440,7 +440,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     if string.match(url, "%?.") then
       local params = string.match(url, "%?(.+)$")
       if string.match(params, "^v=") then
-        check(newurl .. "?" .. string.match(params, "v=(.+)$"))
+        check(newurl .. "?" .. string.match(params, "v=(.*)$"))
       else
         check(newurl .. "?v=" .. params)
       end
@@ -675,6 +675,7 @@ wget.callbacks.write_to_warc = function(url, http_stat)
     end
   end
   if http_stat["statcode"] ~= 200
+    and http_stat["statcode"] ~= 400
     and http_stat["statcode"] ~= 404
     and http_stat["statcode"] ~= 301
     and http_stat["statcode"] ~= 403 then
